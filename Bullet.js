@@ -1,5 +1,3 @@
-import { Vec2 } from "./helperFunctions/vector.js";
-
 export class Bullet {
   constructor(pos, id, shooterId, vel) {
     this.pos = pos;
