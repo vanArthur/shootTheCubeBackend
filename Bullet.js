@@ -15,4 +15,9 @@ export class Bullet {
       this.pos.y + this.vel.y * delta
     );
   }
+  checkOutOfBounds() {
+    return (
+      this.pos.x > 1500 || this.pos.x < 0 || this.pos.y < 0 || this.pos.y > 1000
+    );
+  }
 }
