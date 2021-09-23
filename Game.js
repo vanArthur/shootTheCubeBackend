@@ -30,12 +30,7 @@ export class Game {
                 let bullet = client.bullets[id];
                 this.roomIo.emit("bulletMove", { id: id, pos: bullet.pos });
                 bullet.move();
-                if (
-                  bullet.pos.x > 1500 ||
-                  bullet.pos.x < 0 ||
-                  bullet.pos.y < 0 ||
-                  bullet.pos.y > 1000
-                ) {
+                if (bullet.checkOutOfBounds()) {
                   shouldDelete.push(id);
                 }
               }
