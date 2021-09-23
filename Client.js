@@ -29,6 +29,7 @@ export default class Client {
   removeMe() {
     this.socket.off("keystroke", this.keyListener);
     this.socket.off("bullet", this.bulletListener);
+    this.socket.off("clusterBullet", this.clusterBulletListener);
     this.socket.leave(this.roomId);
     //this.isRemoved = true;
   }
@@ -48,6 +49,13 @@ export default class Client {
       }
     };
     this.socket.on("bullet", this.bulletListener);
+
+    this.clusterBulletListener = () => {
+      if (!this.isRemoved) {
+        this.clusterBullet();
+      }
+    };
+    this.socket.on("clusterBullet", this.clusterBulletListener);
   }
 
   keyStroke(direction, keyState) {
@@ -61,17 +69,24 @@ export default class Client {
     }
   }
 
-  bullet() {
+  clusterBullet() {
+    for (let key in this.moves) {
+      this.bullet(this.moves[key], true);
+    }
+    this.bullet(new Vec2(-3, -3), true);
+    this.bullet(new Vec2(3, 3), true);
+    this.bullet(new Vec2(-3, 3), true);
+    this.bullet(new Vec2(3, -3), true);
+  }
+
+  bullet(direction = this.moves[this.direction], isCluster = false) {
     const bullet = new Bullet(
       new Vec2(this.pos.x, this.pos.y),
       randomId(),
       this.id,
-      this.vel.x !== 0 || this.vel.y !== 0
+      (this.vel.x !== 0 || this.vel.y !== 0) && !isCluster
         ? new Vec2(this.vel.x * 1.5, this.vel.y * 1.5)
-        : new Vec2(
-            this.moves[this.direction].x * 1.5,
-            this.moves[this.direction].y * 1.5
-          )
+        : new Vec2(direction.x * 1.5, direction.y * 1.5)
     );
     this.bullets[bullet.id] = bullet;
   }
