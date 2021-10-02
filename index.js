@@ -5,6 +5,7 @@ const server = http.createServer(app);
 import { Server } from "socket.io";
 import { Game } from "./Game.js";
 import { Vec2 } from "./helperFunctions/vector.js";
+import { randomId } from "./helperFunctions/randomId.js";
 
 const port = 3000;
 
@@ -22,8 +23,6 @@ let moves = {
 };
 
 let games = {};
-games["room1"] = new Game("room1", io);
-games["room2"] = new Game("room2", io);
 
 app.get("/createGame/:roomId", (req, res) => {
   games[req.params.roomId] = new Game(req.params.roomId, io);
@@ -44,9 +43,22 @@ io.on("connection", (socket) => {
     }
   };
 
-  games["room1"].addPlayer(socket, moves, socket.handshake.address, changeRoom);
+  matchMaking().addPlayer(socket, moves, socket.handshake.address, changeRoom);
 });
 
 server.listen(port, () => {
   console.log("listening on *:", port);
 });
+
+function matchMaking() {
+  for (var roomId in games) {
+    if (Object.keys(games[roomId].clients).length < 10) {
+      console.log("did for loop");
+      return games[roomId];
+    }
+  }
+  console.log("dit not loop");
+  const randId = randomId();
+  games[randId] = new Game(randId, io);
+  return games[randId];
+}
