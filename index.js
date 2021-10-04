@@ -40,6 +40,12 @@ io.on("connection", (socket) => {
         socket.handshake.address,
         changeRoom
       );
+    } else {
+      socket.emit("WARN", {
+        type: "removeCanvas",
+        text: "Not a valid room id, \nreload the page to try again!",
+      });
+      socket.disconnect(true);
     }
   };
 

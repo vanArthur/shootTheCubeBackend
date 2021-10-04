@@ -28,11 +28,13 @@ export default class Client {
     this.health = 10;
   }
   removeMe() {
+    this.pos = new Vec2(0, 0);
+    this.vel = new Vec2(0, 0);
     this.socket.off("keystroke", this.keyListener);
     this.socket.off("bullet", this.bulletListener);
     this.socket.off("clusterBullet", this.clusterBulletListener);
     this.socket.leave(this.roomId);
-    //this.isRemoved = true;
+    this.isRemoved = true;
   }
   addMe() {
     this.socket.emit("roomId", this.roomId);

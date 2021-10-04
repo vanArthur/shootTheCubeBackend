@@ -24,7 +24,7 @@ export class Game {
   addPlayer(socket, moves, ip, changeRoom) {
     let client = new Client(
       socket.id,
-      new Vec2(0, 0),
+      new Vec2(50, 100),
       ip,
       moves,
       socket,
