@@ -53,11 +53,9 @@ server.listen(port, () => {
 function matchMaking() {
   for (var roomId in games) {
     if (Object.keys(games[roomId].clients).length < 10) {
-      console.log("did for loop");
       return games[roomId];
     }
   }
-  console.log("dit not loop");
   const randId = randomId();
   games[randId] = new Game(randId, io);
   return games[randId];

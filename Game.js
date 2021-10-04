@@ -15,31 +15,7 @@ export class Game {
       for (var clientId in thisThis.clients) {
         const client = thisThis.clients[clientId];
         if (client !== undefined) {
-          if (client.vel.x !== 0 || client.vel.y !== 0) {
-            const vel = client.vel;
-            thisThis.roomIo.emit("playermove", { id: clientId, vel: vel });
-            if (thisThis.clients[clientId] !== undefined) {
-              client.pos.add(vel);
-            }
-          }
-          if (Object.keys(client.bullets).length > 0) {
-            let shouldDelete = [];
-            this.sendCurrentBullets(); // should only send new bullets!
-            for (var id in client.bullets) {
-              if (client.bullets[id] !== undefined) {
-                let bullet = client.bullets[id];
-                this.roomIo.emit("bulletMove", { id: id, pos: bullet.pos });
-                bullet.move();
-                if (bullet.checkOutOfBounds()) {
-                  shouldDelete.push(id);
-                }
-              }
-            }
-            shouldDelete.forEach((id) => {
-              client.deleteBullet(id);
-              this.roomIo.emit("removeBullet", id);
-            });
-          }
+          client.update(thisThis);
         }
       }
     }, 1000 / 30);
@@ -91,6 +67,7 @@ export class Game {
         id: this.clients[id].did,
         pos: this.clients[id].pos,
         color: this.clients[id].color,
+        health: this.clients[id].health,
       };
     }
     return players;
@@ -105,11 +82,24 @@ export class Game {
     }
     return bullets;
   }
+  getNewBullets() {
+    const bullets = this.getBullets();
+    let returnBullets = {};
+    for (key in bullets) {
+      if (bullets[key].newBullet) {
+        returnBullets[key] = bullets[key];
+      }
+    }
+    return returnBullets;
+  }
 
   sendCurrentPlayers() {
     this.roomIo.emit("currentPlayers", this.getPlayers());
   }
   sendCurrentBullets() {
     this.roomIo.emit("currentBullets", this.getBullets());
+  }
+  sendNewBullets() {
+    this.roomIo.emit("newBullets", getNewBullets());
   }
 }

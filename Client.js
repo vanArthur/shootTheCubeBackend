@@ -25,6 +25,7 @@ export default class Client {
     };
     this.vel = new Vec2(0, 0);
     this.bullets = {};
+    this.health = 10;
   }
   removeMe() {
     this.socket.off("keystroke", this.keyListener);
@@ -41,20 +42,19 @@ export default class Client {
         this.keyStroke(direction.direction, direction.keyState);
       }
     };
-    this.socket.on("keystroke", this.keyListener);
-
     this.bulletListener = () => {
       if (!this.isRemoved) {
         this.bullet();
       }
     };
-    this.socket.on("bullet", this.bulletListener);
-
     this.clusterBulletListener = () => {
       if (!this.isRemoved) {
         this.clusterBullet();
       }
     };
+
+    this.socket.on("bullet", this.bulletListener);
+    this.socket.on("keystroke", this.keyListener);
     this.socket.on("clusterBullet", this.clusterBulletListener);
   }
 
@@ -92,5 +92,46 @@ export default class Client {
   }
   deleteBullet(id) {
     delete this.bullets[id];
+  }
+
+  reduceHealth(amount) {
+    this.health -= amount;
+    this.emitHealth();
+  }
+  increaseHealth(amount) {
+    this.health += amount;
+    this.emitHealth();
+  }
+
+  emitHealth() {
+    this.roomIo.emit("PlayerHealth", { id: this.id, health: this.health });
+  }
+
+  update(gameClass) {
+    if (this.vel.x !== 0 || this.vel.y !== 0) {
+      this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
+      if (this !== undefined) {
+        this.pos.add(this.vel);
+      }
+    }
+    if (Object.keys(this.bullets).length > 0) {
+      let shouldDelete = [];
+      gameClass.sendNewBullets(); // should only send new bullets!
+      for (var id in this.bullets) {
+        if (this.bullets[id] !== undefined) {
+          let bullet = this.bullets[id];
+          this.roomIo.emit("bulletMove", { id: id, pos: bullet.pos });
+          bullet.move();
+          bullet.checkPlayerCollision(this.clients);
+          if (bullet.checkOutOfBounds()) {
+            shouldDelete.push(id);
+          }
+        }
+      }
+      shouldDelete.forEach((id) => {
+        this.deleteBullet(id);
+        this.roomIo.emit("removeBullet", id);
+      });
+    }
   }
 }
