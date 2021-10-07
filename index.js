@@ -28,9 +28,22 @@ app.get("/createGame/:roomId", (req, res) => {
   games[req.params.roomId] = new Game(req.params.roomId, io);
   res.send(req.params.roomId);
 });
+app.get("/getGames", (req, res) => {
+  let returnGames = [];
+  for (var key in games) {
+    returnGames.push({
+      id: games[key].id,
+      playerCount: Object.keys(games[key].clients).length,
+    });
+  }
+  res.send({ returnGames });
+});
 
 io.on("connection", (socket) => {
   console.log("=> client connected", socket.handshake.address);
+  socket.on("disconnect", () => {
+    removeEmpty();
+  });
 
   let changeRoom = (roomId) => {
     if (games[roomId] !== undefined) {
@@ -65,4 +78,12 @@ function matchMaking() {
   const randId = randomId();
   games[randId] = new Game(randId, io);
   return games[randId];
+}
+
+async function removeEmpty() {
+  for (var roomId in games) {
+    if (Object.keys(games[roomId].clients).length === 0) {
+      delete games[roomId];
+    }
+  }
 }

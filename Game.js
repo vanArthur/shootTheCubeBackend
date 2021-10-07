@@ -85,7 +85,7 @@ export class Game {
   getNewBullets() {
     const bullets = this.getBullets();
     let returnBullets = {};
-    for (key in bullets) {
+    for (var key in bullets) {
       if (bullets[key].newBullet) {
         returnBullets[key] = bullets[key];
       }
@@ -100,6 +100,6 @@ export class Game {
     this.roomIo.emit("currentBullets", this.getBullets());
   }
   sendNewBullets() {
-    this.roomIo.emit("newBullets", getNewBullets());
+    this.roomIo.emit("newBullets", this.getNewBullets());
   }
 }

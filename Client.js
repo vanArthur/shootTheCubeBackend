@@ -5,7 +5,7 @@ export default class Client {
   constructor(id, pos, ip, moves, socket, roomIo, roomId) {
     this.id = id;
     this.pos = pos;
-    this.direction = "";
+    this.direction = "right";
     this.ip = ip;
     this.socket = socket;
     this.roomIo = roomIo;
@@ -124,7 +124,7 @@ export default class Client {
           let bullet = this.bullets[id];
           this.roomIo.emit("bulletMove", { id: id, pos: bullet.pos });
           bullet.move();
-          bullet.checkPlayerCollision(this.clients);
+          bullet.checkPlayerCollision(gameClass.clients);
           if (bullet.checkOutOfBounds()) {
             shouldDelete.push(id);
           }
