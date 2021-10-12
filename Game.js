@@ -1,4 +1,4 @@
-import Client from "./Client.js";
+import Client from "./entities/Client.js";
 import { Vec2 } from "./helperFunctions/vector.js";
 
 export class Game {
@@ -7,6 +7,7 @@ export class Game {
     this.clients = {};
     this.roomIo = io.to(this.id);
     this.startLoop();
+    this.playerSize = 10;
   }
 
   startLoop() {
@@ -24,6 +25,7 @@ export class Game {
   addPlayer(socket, moves, ip, changeRoom) {
     let client = new Client(
       socket.id,
+      this.playerSize,
       new Vec2(50, 100),
       ip,
       moves,
@@ -68,6 +70,7 @@ export class Game {
         pos: this.clients[id].pos,
         color: this.clients[id].color,
         health: this.clients[id].health,
+        playerSize: this.clients[id].playerSize,
       };
     }
     return players;
