@@ -66,21 +66,23 @@ export default class Client {
 
   clusterBullet() {
     for (let key in this.moves) {
-      this.bullet(this.moves[key], true);
+      this.bullet(new Vec2(this.moves[key].x / 3, this.moves[key].y / 3), true);
     }
-    this.bullet(new Vec2(-3, -3), true);
-    this.bullet(new Vec2(3, 3), true);
-    this.bullet(new Vec2(-3, 3), true);
-    this.bullet(new Vec2(3, -3), true);
+    this.bullet(new Vec2(-1, -1), true);
+    this.bullet(new Vec2(1, 1), true);
+    this.bullet(new Vec2(-1, 1), true);
+    this.bullet(new Vec2(1, -1), true);
   }
 
   bullet(direction = this.moves[this.direction], isCluster = false) {
     const bullet = new Bullet(
-      new Vec2(this.pos.x, this.pos.y),
+      new Vec2(
+        this.pos.x + this.playerSize / 2,
+        this.pos.y + this.playerSize / 2
+      ),
       randomId(),
       this.id,
-      new Vec2(direction.x * 3 * 1.5, direction.y * 3 * 1.5),
-      this.playerSize
+      new Vec2(direction.x * 3 * 1.5, direction.y * 3 * 1.5)
     );
     this.bullets[bullet.id] = bullet;
   }
@@ -114,10 +116,7 @@ export default class Client {
       for (var id in this.bullets) {
         if (this.bullets[id] !== undefined) {
           let bullet = this.bullets[id];
-          this.roomIo.emit("bulletMove", { id: id, pos: bullet.pos });
-          bullet.move();
-          bullet.checkPlayerCollision(gameClass.clients);
-          if (bullet.checkOutOfBounds()) {
+          if (bullet.update(gameClass)) {
             shouldDelete.push(id);
           }
         }
