@@ -103,6 +103,9 @@ export class Game {
     this.roomIo.emit("currentBullets", this.getBullets());
   }
   sendNewBullets() {
-    this.roomIo.emit("newBullets", this.getNewBullets());
+    const newBullets = this.getNewBullets();
+    if (newBullets !== {}) {
+      this.roomIo.emit("newBullets", this.getNewBullets());
+    }
   }
 }

@@ -3,7 +3,7 @@ import Entity from "./Entity.js";
 
 export class Bullet extends Entity {
   constructor(pos, id, shooterId, vel) {
-    super(pos, vel);
+    super(id, pos, vel);
     this.shooter = shooterId;
     this.id = id;
     this.shot = [];

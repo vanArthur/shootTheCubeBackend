@@ -80,7 +80,7 @@ export default class Client extends Entity {
       ),
       randomId(),
       this.id,
-      new Vec2(direction.x * 3 * 1.5, direction.y * 3 * 1.5)
+      new Vec2(direction.x * 20, direction.y * 20)
     );
     this.bullets[bullet.id] = bullet;
   }
