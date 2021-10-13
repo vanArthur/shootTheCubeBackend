@@ -41,10 +41,10 @@ export default class GameManager {
 
   getGamesArray() {
     let returnGames = [];
-    for (var key in games) {
+    for (var key in this.games) {
       returnGames.push({
-        id: games[key].id,
-        playerCount: Object.keys(games[key].clients).length,
+        id: this.games[key].id,
+        playerCount: Object.keys(this.games[key].clients).length,
       });
     }
     return returnGames;

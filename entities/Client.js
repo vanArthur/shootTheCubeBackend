@@ -1,11 +1,11 @@
 import { Bullet } from "./Bullet.js";
 import { Vec2 } from "../helperFunctions/vector.js";
 import { randomId } from "../helperFunctions/randomId.js";
-export default class Client {
+import Entity from "./Entity.js";
+export default class Client extends Entity {
   constructor(id, playerSize, pos, ip, moves, socket, roomIo, roomId) {
-    this.id = id;
+    super(id, pos, new Vec2(0, 0));
     this.playerSize = playerSize;
-    this.pos = pos;
     this.ip = ip;
     this.socket = socket;
     this.roomIo = roomIo;
@@ -20,7 +20,6 @@ export default class Client {
       left: 0,
       right: 0,
     };
-    this.vel = new Vec2(0, 0);
     this.bullets = {};
     this.health = 10;
 
@@ -28,8 +27,7 @@ export default class Client {
     this.socket.emit("id", this.id);
   }
   removeMe() {
-    this.pos = new Vec2(0, 0);
-    this.vel = new Vec2(0, 0);
+    this.reset();
     this.socket.off("keystroke", this.keyListener);
     this.socket.off("bullet", this.bulletListener);
     this.socket.off("clusterBullet", this.clusterBulletListener);
@@ -107,7 +105,7 @@ export default class Client {
     if (this.vel.x !== 0 || this.vel.y !== 0) {
       this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
       if (this !== undefined) {
-        this.pos.add(this.vel);
+        this.move();
       }
     }
     if (Object.keys(this.bullets).length > 0) {

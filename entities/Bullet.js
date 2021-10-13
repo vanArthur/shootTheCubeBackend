@@ -1,27 +1,22 @@
 import { cubeCollision } from "../helperFunctions/collision.js";
+import Entity from "./Entity.js";
 
-export class Bullet {
+export class Bullet extends Entity {
   constructor(pos, id, shooterId, vel) {
-    this.pos = pos;
+    super(pos, vel);
     this.shooter = shooterId;
     this.id = id;
-    this.vel = vel;
     this.shot = [];
     this.newBullet = true;
     this.size = 5;
   }
 
   move(gameClass) {
-    this.pos.add(this.vel);
+    super.move();
     this.newBullet = false;
     gameClass.roomIo.emit("bulletMove", { id: this.id, pos: this.pos });
   }
-  deltaMove(delta) {
-    this.pos.set(
-      this.pos.x + this.vel.x * delta,
-      this.pos.y + this.vel.y * delta
-    );
-  }
+
   checkOutOfBounds() {
     return (
       this.pos.x > 1500 || this.pos.x < 0 || this.pos.y < 0 || this.pos.y > 1000
@@ -63,6 +58,5 @@ export class Bullet {
       shouldDelete = true;
     }
     return shouldDelete;
-    s;
   }
 }

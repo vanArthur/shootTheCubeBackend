@@ -7,7 +7,7 @@ export class Game {
     this.clients = {};
     this.roomIo = io.to(this.id);
     this.startLoop();
-    this.playerSize = 50;
+    this.playerSize = 30;
   }
 
   startLoop() {
