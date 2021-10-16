@@ -19,7 +19,7 @@ export class Game {
           client.update(thisThis);
         }
       }
-    }, 1000 / 30);
+    }, 1000 / 45);
   }
 
   addPlayer(socket, moves, ip, changeRoom) {
@@ -37,6 +37,7 @@ export class Game {
     this.clients[client.id].socket.join(this.id);
     this.sendCurrentPlayers();
     this.sendCurrentBullets();
+    this.sendCurrentWalls();
 
     this.changeRoomListener = (roomId) => {
       this.removePlayer(client.id);
@@ -95,17 +96,51 @@ export class Game {
     }
     return returnBullets;
   }
-
-  sendCurrentPlayers() {
-    this.roomIo.emit("currentPlayers", this.getPlayers());
-  }
   sendCurrentBullets() {
     this.roomIo.emit("currentBullets", this.getBullets());
   }
   sendNewBullets() {
     const newBullets = this.getNewBullets();
-    if (newBullets !== {}) {
+    if (Object.keys(newBullets).length > 0) {
       this.roomIo.emit("newBullets", this.getNewBullets());
     }
+  }
+
+  getWalls(full) {
+    let walls = {};
+    for (var id in this.clients) {
+      for (var key in this.clients[id].walls) {
+        if (full) {
+          walls[key] = this.clients[id].walls[key];
+        } else {
+          walls[key] = this.clients[id].walls[key].getSelf();
+        }
+      }
+    }
+    return walls;
+  }
+  getNewWalls() {
+    const walls = this.getWalls(false);
+    let returnWalls = {};
+    for (var key in walls) {
+      if (walls[key].isNew) {
+        returnWalls[key] = walls[key];
+      }
+    }
+    return returnWalls;
+  }
+
+  sendCurrentWalls() {
+    this.roomIo.emit("currentWalls", this.getWalls(false));
+  }
+  sendNewWalls() {
+    const newWalls = this.getNewWalls();
+    if (Object.keys(newWalls).length > 0) {
+      this.roomIo.emit("newWalls", newWalls);
+    }
+  }
+
+  sendCurrentPlayers() {
+    this.roomIo.emit("currentPlayers", this.getPlayers());
   }
 }
