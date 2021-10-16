@@ -2,6 +2,7 @@ import { Bullet } from "./Bullet.js";
 import { Vec2 } from "../helperFunctions/vector.js";
 import { randomId } from "../helperFunctions/randomId.js";
 import Entity from "./Entity.js";
+import Wall from "./Wall.js";
 export default class Client extends Entity {
   constructor(id, playerSize, pos, ip, moves, socket, roomIo, roomId) {
     super(id, pos, new Vec2(0, 0));
@@ -21,6 +22,7 @@ export default class Client extends Entity {
       right: 0,
     };
     this.bullets = {};
+    this.walls = {};
     this.health = 10;
 
     this.addMe();
@@ -31,6 +33,7 @@ export default class Client extends Entity {
     this.socket.off("keystroke", this.keyListener);
     this.socket.off("bullet", this.bulletListener);
     this.socket.off("clusterBullet", this.clusterBulletListener);
+    this.socket.off("wall", this.wallListener);
     this.socket.leave(this.roomId);
   }
   addMe() {
@@ -45,10 +48,14 @@ export default class Client extends Entity {
     this.clusterBulletListener = () => {
       this.clusterBullet();
     };
+    this.wallListener = (vec) => {
+      this.wall(vec);
+    };
 
     this.socket.on("bullet", this.bulletListener);
     this.socket.on("keystroke", this.keyListener);
     this.socket.on("clusterBullet", this.clusterBulletListener);
+    this.socket.on("wall", this.wallListener);
   }
 
   keyStroke(direction, keyState) {
@@ -73,6 +80,9 @@ export default class Client extends Entity {
   }
 
   bullet(direction = this.moves[this.direction], isCluster = false) {
+    let bulletVec = new Vec2(direction.x, direction.y);
+    bulletVec.normalize();
+
     const bullet = new Bullet(
       new Vec2(
         this.pos.x + this.playerSize / 2,
@@ -80,10 +90,53 @@ export default class Client extends Entity {
       ),
       randomId(),
       this.id,
-      new Vec2(direction.x * 20, direction.y * 20)
+      new Vec2(bulletVec.x * 10, bulletVec.y * 10)
     );
     this.bullets[bullet.id] = bullet;
   }
+  wall(vecInput) {
+    let wallvec = new Vec2(Math.round(vecInput.x), Math.round(vecInput.y));
+    let wallpos = new Vec2(this.pos.x, this.pos.y);
+    let width = 0;
+    let height = 0;
+
+    if (wallvec.x === 0) {
+      width = this.playerSize + this.playerSize / 2;
+      height = this.playerSize < 10 ? 5 : this.playerSize / 5;
+      if (wallvec.y > 0) {
+        wallpos.add(
+          new Vec2(-this.playerSize / 4, this.playerSize + this.playerSize / 4)
+        );
+      } else {
+        wallpos.add(
+          new Vec2(-this.playerSize / 4, -this.playerSize / 4 - height)
+        );
+      }
+    } else {
+      height = this.playerSize + this.playerSize / 2;
+      width = this.playerSize < 10 ? 5 : this.playerSize / 5;
+      if (wallvec.x > 0) {
+        wallpos.add(
+          new Vec2(this.playerSize + this.playerSize / 4, -this.playerSize / 4)
+        );
+      } else {
+        wallpos.add(
+          new Vec2(-this.playerSize / 4 - width, -this.playerSize / 4)
+        );
+      }
+    }
+    const wall = new Wall(
+      randomId(),
+      wallpos,
+      this.id,
+      this.color,
+      this.roomIo,
+      width,
+      height
+    );
+    this.walls[wall.id] = wall;
+  }
+
   deleteBullet(id) {
     delete this.bullets[id];
   }
@@ -106,6 +159,16 @@ export default class Client extends Entity {
       this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
       if (this !== undefined) {
         this.move();
+      }
+    }
+    if (Object.keys(this.walls).length > 0) {
+      gameClass.sendNewWalls();
+      for (var id in this.walls) {
+        if (this.walls[id] !== undefined) {
+          if (this.walls[id].shouldDelete) {
+            delete this.walls[id];
+          }
+        }
       }
     }
     if (Object.keys(this.bullets).length > 0) {
