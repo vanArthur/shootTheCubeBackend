@@ -167,10 +167,49 @@ export default class Client extends Entity {
     this.roomIo.emit("PlayerHealth", { id: this.id, health: this.health });
   }
 
+  checkWallColision() {
+    for (var id in this.walls) {
+      const wall = this.walls[id];
+      const dist = Math.sqrt(
+        (wall.pos.x - this.pos.x) ** 2 + (wall.pos.y - this.pos.y) ** 2
+      );
+
+      if (dist < this.playerSize + 20) {
+        if (
+          cubeCollision(
+            new Vec2(this.pos.x, this.pos.y).add(this.vel),
+            this.playerSize,
+            this.playerSize,
+            wall.pos,
+            wall.shape[0].width,
+            wall.shape[0].height
+          ) ||
+          cubeCollision(
+            new Vec2(this.pos.x, this.pos.y).add(
+              new Vec2(this.vel.x, this.vel.y).normalize()
+            ),
+            this.playerSize,
+            this.playerSize,
+            wall.pos,
+            wall.shape[0].width,
+            wall.shape[0].height
+          )
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   update(gameClass) {
     if (this.vel.x !== 0 || this.vel.y !== 0) {
-      this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
-      this.move();
+      if (this !== undefined) {
+        if (!this.checkWallColision()) {
+          this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
+          this.move();
+        }
+      }
     }
     if (Object.keys(this.walls).length > 0) {
       gameClass.sendNewWalls();
