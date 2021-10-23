@@ -1,21 +1,44 @@
-export function Rect(ctx, x, y, w, h, color, stroke) {
-  ctx.fillStyle = color;
-  ctx.fillRect(x, y, w, h); // (x, y, width, height)
-  if (stroke) {
-    ctx.fillStyle = "rgb(0, 0, 0)";
-    ctx.strokeRect(x, y, w, h);
+class Shape {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+  }
+}
+export class Rectangle extends Shape {
+  constructor(x, y, width, height, color) {
+    super(x, y, color);
+    this.width = width;
+    this.height = height;
+    this.color = color;
+    this.shapeName = "Rectangle";
+  }
+}
+export class Circle extends Shape {
+  constructor(x, y, radius, stroke, color) {
+    super(x, y, color);
+    this.radius = radius;
+    this.stroke = stroke;
+    this.shapeName = "Circle";
   }
 }
 
-export function circle(ctx, x, y, r, filltype) {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, 2 * Math.PI); //(x, y, radius, magic, path)
-  if (filltype === "stroke") {
-    ctx.stroke();
-  } else if (filltype === "fill") {
-    ctx.fill();
-  } else {
-    console.error("wrong fillType in circle function");
+export class Line extends Shape {
+  constructor(x, y, tx, ty, color) {
+    super(x, y, color);
+    this.tx = tx;
+    this.ty = ty;
+    this.width = 3;
+    this.shapeName = "Line";
+  }
+}
+
+export class Text extends Shape {
+  constructor(x, y, color, text, size, font) {
+    super(x, y, color);
+    this.text = text;
+    this.size = size;
+    this.font = font;
+    this.shapeName = "Text";
   }
 }
