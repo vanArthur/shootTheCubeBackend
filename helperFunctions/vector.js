@@ -10,10 +10,15 @@ export class Vec2 {
   add(vec2) {
     this.x += vec2.x;
     this.y += vec2.y;
+    return this;
   }
   subtract(vec2) {
     this.x -= vec2.x;
     this.y -= vec2.y;
+  }
+  multiply(vec2) {
+    this.x *= vec2.x;
+    this.y *= vec2.y;
   }
 
   mag() {
