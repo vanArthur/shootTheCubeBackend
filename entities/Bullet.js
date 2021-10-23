@@ -1,5 +1,6 @@
 import { Circle } from "../helperFunctions/canvas.js";
 import { cubeCollision } from "../helperFunctions/collision.js";
+import { distBetweenPoints } from "../helperFunctions/math.js";
 import { Vec2 } from "../helperFunctions/vector.js";
 import { Ray } from "../Ray.js";
 import Entity from "./Entity.js";
@@ -34,8 +35,11 @@ export class Bullet extends Entity {
       if (!this.shot.includes(playerId)) {
         const player = players[playerId];
         if (
-          Math.sqrt(
-            (player.pos.x - this.pos.x) ** 2 + (player.pos.y - this.pos.y) ** 2
+          distBetweenPoints(
+            this.pos.x,
+            this.pos.y,
+            player.pos.x,
+            player.pos.y
           ) >
           player.playerSize + 5
         ) {
@@ -75,12 +79,18 @@ export class Bullet extends Entity {
           if (this.closestWallPos == undefined) {
             this.closestWallPos = cast;
             this.closestWall = wall;
-            closestDist = Math.sqrt(
-              (cast.x - this.pos.x) ** 2 + (cast.y - this.pos.y) ** 2
+            closestDist = distBetweenPoints(
+              this.pos.x,
+              this.pos.y,
+              cast.x,
+              cast.y
             );
           } else {
-            const dist = Math.sqrt(
-              (cast.x - this.pos.x) ** 2 + (cast.y - this.pos.y) ** 2
+            const dist = distBetweenPoints(
+              this.pos.x,
+              this.pos.y,
+              cast.x,
+              cast.y
             );
             if (dist < closestDist) {
               closestDist = dist;

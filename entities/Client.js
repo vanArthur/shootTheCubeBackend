@@ -5,6 +5,7 @@ import Entity from "./Entity.js";
 import Wall from "./Wall.js";
 import { Rectangle, Text } from "../helperFunctions/canvas.js";
 import { cubeCollision } from "../helperFunctions/collision.js";
+import { distBetweenPoints } from "../helperFunctions/math.js";
 
 export default class Client extends Entity {
   constructor(id, playerSize, pos, ip, moves, socket, roomIo, roomId) {
@@ -170,8 +171,11 @@ export default class Client extends Entity {
   checkWallColision() {
     for (var id in this.walls) {
       const wall = this.walls[id];
-      const dist = Math.sqrt(
-        (wall.pos.x - this.pos.x) ** 2 + (wall.pos.y - this.pos.y) ** 2
+      const dist = distBetweenPoints(
+        this.pos.x,
+        this.pos.y,
+        wall.pos.x,
+        wall.pos.y
       );
 
       if (dist < this.playerSize + 20) {
