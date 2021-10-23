@@ -1,3 +1,4 @@
+import { Circle } from "../helperFunctions/canvas.js";
 import { cubeCollision } from "../helperFunctions/collision.js";
 import { Vec2 } from "../helperFunctions/vector.js";
 import { Ray } from "../Ray.js";
@@ -5,7 +6,7 @@ import Entity from "./Entity.js";
 
 export class Bullet extends Entity {
   constructor(pos, id, shooterId, vel) {
-    super(id, pos, vel);
+    super(id, pos, vel, new Circle(0, 0, 3, false, "black"));
     this.shooter = shooterId;
     this.id = id;
     this.shot = [];
@@ -33,6 +34,15 @@ export class Bullet extends Entity {
       if (!this.shot.includes(playerId)) {
         const player = players[playerId];
         if (
+          Math.sqrt(
+            (player.pos.x - this.pos.x) ** 2 + (player.pos.y - this.pos.y) ** 2
+          ) >
+          player.playerSize + 5
+        ) {
+          return false;
+        }
+
+        if (
           cubeCollision(
             this.pos,
             this.size,
@@ -57,13 +67,14 @@ export class Bullet extends Entity {
     let newVec = new Vec2(this.vel.x, this.vel.y);
     let ray = new Ray(new Vec2(this.pos.x, this.pos.y), newVec);
     for (var id in walls) {
-      walls[id].borders.forEach((line) => {
+      const wall = walls[id];
+      wall.borders.forEach((line) => {
         let cast = ray.cast(line);
 
         if (cast !== undefined) {
           if (this.closestWallPos == undefined) {
             this.closestWallPos = cast;
-            this.closestWall = walls[id];
+            this.closestWall = wall;
             closestDist = Math.sqrt(
               (cast.x - this.pos.x) ** 2 + (cast.y - this.pos.y) ** 2
             );
@@ -74,7 +85,7 @@ export class Bullet extends Entity {
             if (dist < closestDist) {
               closestDist = dist;
               this.closestWallPos = cast;
-              this.closestWall = walls[id];
+              this.closestWall = wall;
             }
           }
         }

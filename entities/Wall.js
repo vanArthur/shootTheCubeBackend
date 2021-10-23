@@ -1,15 +1,16 @@
+import { Rectangle } from "../helperFunctions/canvas.js";
 import { Vec2 } from "../helperFunctions/vector.js";
 import Entity from "./Entity.js";
 
 export default class Wall extends Entity {
   constructor(id, pos, creator, color, roomIo, width, height) {
-    super(id, pos, new Vec2(0, 0));
+    super(id, pos, new Vec2(0, 0), new Rectangle(0, 0, width, height, color));
+
+    this.shape[0].color = `${color.slice(0, -1)},1)`;
+
     this.health = 5;
     this.creator = creator;
-    this.color = color;
     this.roomIo = roomIo;
-    this.width = width;
-    this.height = height;
     this.isNew = true;
     this.shouldDelete = false;
     this.borders = this.getBorders();
@@ -32,10 +33,8 @@ export default class Wall extends Entity {
       id: this.id,
       pos: this.pos,
       health: this.health,
-      color: this.color,
       isNew: this.isNew,
-      width: this.width,
-      height: this.height,
+      shape: this.shape,
     };
     this.isNew = false;
     return returndata;
@@ -43,11 +42,11 @@ export default class Wall extends Entity {
 
   getBorders() {
     const topLeft = new Vec2(this.pos.x, this.pos.y);
-    const topRight = new Vec2(this.pos.x + this.width, this.pos.y);
-    const bottomLeft = new Vec2(this.pos.x, this.pos.y + this.height);
+    const topRight = new Vec2(this.pos.x + this.shape[0].width, this.pos.y);
+    const bottomLeft = new Vec2(this.pos.x, this.pos.y + this.shape[0].height);
     const bottomRight = new Vec2(
-      this.pos.x + this.width,
-      this.pos.y + this.height
+      this.pos.x + this.shape[0].width,
+      this.pos.y + this.shape[0].height
     );
     const borders = [
       [topLeft, topRight],

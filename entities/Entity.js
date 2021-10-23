@@ -1,10 +1,15 @@
 import { Vec2 } from "../helperFunctions/vector.js";
 
 export default class Entity {
-  constructor(id, pos, vel) {
-    this.pos = pos;
-    this.vel = vel;
+  constructor(id, pos, vel, shape) {
+    this.pos = new Vec2(pos.x, pos.y);
+    this.vel = new Vec2(vel.x, vel.y);
     this.id = id;
+    if (Array.isArray(shape)) {
+      this.shape = shape;
+    } else {
+      this.shape = [shape];
+    }
   }
 
   move() {

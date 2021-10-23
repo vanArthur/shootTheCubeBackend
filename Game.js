@@ -72,6 +72,7 @@ export class Game {
         color: this.clients[id].color,
         health: this.clients[id].health,
         playerSize: this.clients[id].playerSize,
+        shape: this.clients[id].shape,
       };
     }
     return players;

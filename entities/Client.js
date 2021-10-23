@@ -3,18 +3,29 @@ import { Vec2 } from "../helperFunctions/vector.js";
 import { randomId } from "../helperFunctions/randomId.js";
 import Entity from "./Entity.js";
 import Wall from "./Wall.js";
+import { Rectangle, Text } from "../helperFunctions/canvas.js";
+import { cubeCollision } from "../helperFunctions/collision.js";
+
 export default class Client extends Entity {
   constructor(id, playerSize, pos, ip, moves, socket, roomIo, roomId) {
-    super(id, pos, new Vec2(0, 0));
+    super(id, pos, new Vec2(0, 0), [
+      new Rectangle(
+        0,
+        0,
+        playerSize,
+        playerSize,
+        `rgb(${Math.random() * 240 + 15}, ${Math.random() * 240 + 15}, ${
+          Math.random() * 240 + 15
+        })`
+      ),
+      new Text(playerSize / 2, -10, "white", 10, "20px", "Arial"),
+    ]);
     this.playerSize = playerSize;
     this.ip = ip;
     this.socket = socket;
     this.roomIo = roomIo;
     this.moves = moves;
     this.roomId = roomId;
-    this.color = `rgb(${Math.random() * 240 + 15}, ${
-      Math.random() * 240 + 15
-    }, ${Math.random() * 240 + 15})`;
     this.keyStates = {
       up: 0,
       down: 0,
@@ -129,7 +140,7 @@ export default class Client extends Entity {
       randomId(),
       wallpos,
       this.id,
-      this.color,
+      this.shape[0].color,
       this.roomIo,
       width,
       height
@@ -143,10 +154,12 @@ export default class Client extends Entity {
 
   reduceHealth(amount) {
     this.health -= amount;
+    this.shape[1].text = this.health;
     this.emitHealth();
   }
   increaseHealth(amount) {
     this.health += amount;
+    this.shape[1].text = this.health;
     this.emitHealth();
   }
 
@@ -157,9 +170,7 @@ export default class Client extends Entity {
   update(gameClass) {
     if (this.vel.x !== 0 || this.vel.y !== 0) {
       this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
-      if (this !== undefined) {
-        this.move();
-      }
+      this.move();
     }
     if (Object.keys(this.walls).length > 0) {
       gameClass.sendNewWalls();
