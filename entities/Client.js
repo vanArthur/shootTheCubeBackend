@@ -168,9 +168,9 @@ export default class Client extends Entity {
     this.roomIo.emit("PlayerHealth", { id: this.id, health: this.health });
   }
 
-  checkWallColision() {
-    for (var id in this.walls) {
-      const wall = this.walls[id];
+  checkWallColision(walls) {
+    for (var id in walls) {
+      const wall = walls[id];
       const dist = distBetweenPoints(
         this.pos.x,
         this.pos.y,
@@ -209,7 +209,7 @@ export default class Client extends Entity {
   update(gameClass) {
     if (this.vel.x !== 0 || this.vel.y !== 0) {
       if (this !== undefined) {
-        if (!this.checkWallColision()) {
+        if (!this.checkWallColision(gameClass.getWalls(true))) {
           this.roomIo.emit("playermove", { id: this.id, vel: this.vel });
           this.move();
         }
