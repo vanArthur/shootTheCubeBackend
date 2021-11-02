@@ -10,16 +10,19 @@ const port = 3000;
 const io = new Server(server, {
   cors: {
     origin: "*",
+    allowedHeaders: "*",
   },
 });
 
-let gameManager = new GameManager(io);
+let gameManager = new GameManager(io, debug);
 
 app.get("/createGame/:roomId", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   gameManager.addGame(req.params.roomId);
   res.send(req.params.roomId);
 });
 app.get("/getGames", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
   const returnGames = gameManager.getGamesArray();
   res.send({ returnGames });
 });
