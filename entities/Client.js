@@ -46,6 +46,7 @@ export default class Client extends Entity {
     this.socket.off("bullet", this.bulletListener);
     this.socket.off("clusterBullet", this.clusterBulletListener);
     this.socket.off("wall", this.wallListener);
+    this.socket.emit("removeEntities");
     this.socket.leave(this.roomId);
   }
   addMe() {
