@@ -43,7 +43,7 @@ export class Bullet extends Entity {
           ) >
           player.playerSize + 5
         ) {
-          return false;
+          continue;
         }
 
         if (
