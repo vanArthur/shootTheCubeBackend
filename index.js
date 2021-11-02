@@ -14,7 +14,7 @@ const io = new Server(server, {
   },
 });
 
-let gameManager = new GameManager(io, debug);
+let gameManager = new GameManager(io);
 
 app.get("/createGame/:roomId", (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
